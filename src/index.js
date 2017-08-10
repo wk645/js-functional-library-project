@@ -1,16 +1,17 @@
 fi = function(){
 	return {
 		each: function(list, iteratee, context) {
+			let callback = null
 
 			if (context) {
-				const callback = iteratee.bind(context)
+				callback = iteratee.bind(context)
 			} else {
-				const callback = iteratee
+				callback = iteratee
 			}
 
 			if (Array.isArray(list)) {
 				for (let i = 0; i < list.length; i++) {
-			callback(list[i], i, list)
+					callback(list[i], i, list)
 			}} else if (typeof list === 'object') {
 				for (const key in list) {
 					const value = list[key]
@@ -22,10 +23,11 @@ fi = function(){
 
 		map: function(list, iteratee, context) {
 
+			let callback = null
 			if (context) {
-				const callback = iteratee.bind(context)
+				callback = iteratee.bind(context)
 			} else {
-				const callback = iteratee
+				callback = iteratee
 			}
 
 			const newArray = []
@@ -48,21 +50,23 @@ fi = function(){
 		},
 
 		reduce: function(list, iteratee, memo, context) {
-
+			let callback = null
+			let newList = null
+			let number = null 
 			if (context) {
-				const callback = iteratee.bind(context)
+				callback = iteratee.bind(context)
 			} else {
-				const callback = iteratee
+				callback = iteratee
 			}
 
 			if (memo) {
-				const newList = [memo].concat(list)
+				newList = [memo].concat(list)
 			} else {
-				const newList = list
+				newList = list
 			}
 
 			if (Array.isArray(newList)) {
-				let number = newList[0]
+				number = newList[0]
 
 				for (let i = 1; i < newList.length; i ++) {
 					number = callback(number, newList[i], i, newList)
@@ -71,7 +75,7 @@ fi = function(){
 
 				let keys = Object.keys(newList)
 				let values = Object.values(newList)
-				let number = values[0]
+				number = values[0]
 
 				for (let i = 1; i < values.length; i++) {
 					number = callback(number, values[i], keys[i], newList)
@@ -83,17 +87,19 @@ fi = function(){
 		},
 
 		find: function(list, predicate, context) {
-			
+			let callback = null
+			let newList = null
+
 			if (context) {
-				const callback = predicate.bind(context)
+				callback = predicate.bind(context)
 			} else {
-				const callback = predicate
+				callback = predicate
 			}
 
 			if (Array.isArray(list)) {
-				let newList = list
+				newList = list
 			} else if (typeof list === 'object') {
-				let newList = Object.values(list)
+				newList = Object.values(list)
 			}
 
 			for (i = 0; i < newList.length; i++) {
@@ -105,16 +111,20 @@ fi = function(){
 
 		filter: function(list, predicate, context) {
 
+
+			let callback = null
+			let newList = null
+
 			if (context) {
-				const callback = predicate.bind(context)
+				callback = predicate.bind(context)
 			} else {
-				const callback = predicate
+				callback = predicate
 			}
 
 			if (Array.isArray(list)) {
-				let newList = list
+				newList = list
 			} else if (typeof list === 'object') {
-				let newList = Object.values(list)
+				newList = Object.values(list)
 			}
 
 			let newValues = []
@@ -129,25 +139,28 @@ fi = function(){
 		},
 
 		sortBy: function(list, iteratee, context) {
+			let callback = null
+			let finalValues = []
+
 
 			if (typeof iteratee === 'string') {
 
-			let selectedValues = []
-			let keys = Object.keys(list)
-			let values = Object.values(list)
-			let finalValues
+				let selectedValues = []
+				let keys = Object.keys(list)
+				let values = Object.values(list)
+			
 
 				for (let i = 0; i < list.length; i++) {
 					selectedValues.push(list[i][iteratee])
 				}
 
-				let sortedValues = selectedValues.sort()
+				let sortedValues = selectedValues.slice().sort()
 
 				for (let i = 0; i < sortedValues.length; i++) {
 					
-					for (let j = 0; i < selectedValues.length; i++) {
+					for (let j = 0; j < selectedValues.length; j++) {
 
-						if (sortedValues[i] === list[j][iteratee]) {
+						if (sortedValues[i] === selectedValues[j]) {
 
 							finalValues.push(list[j])
 							break
@@ -158,28 +171,27 @@ fi = function(){
 			} else {
 				
 				if (context) {
-			 		const callback = iteratee.bind(context)
+			 		callback = iteratee.bind(context)
 			 	} else {
-			 		const callback = iteratee
+			 		callback = iteratee
 			 	}
 			 	
-			 	const mutatedValues = list.map(callback(element, i, list))
+			 	const mutatedValues = list.map(callback)
 
 			 	// let pairedValues = []
-			 	let finalValues = []
+			 	
 
 			 	// for (let i = 0; i < list.length; i++) {
 			 	// 	pairedValues.push({index: i, mutatedValue: mutatedValues[i]})
 			 	// }
 
-			 	let sortedMv = mutatedValues.sort()
-			 	let sortedIndex
+			 	let sortedMv = mutatedValues.slice().sort((a,b)=> (a-b))
 
 			 	for (let i = 0; i < sortedMv.length; i++) {
 			 		
 			 		for (let j = 0; j < list.length; j++) {
 
-			 			if (sortedMv[i] === list[j].mutatedValue) {
+			 			if (sortedMv[i] === mutatedValues[j]) {
 			 				
 			 				finalValues.push(list[j])
 			 				break
@@ -194,7 +206,11 @@ fi = function(){
 
 		size: function(list) {
 
-			return list.length
+			if (Array.isArray(list)) {
+				return list.length
+			} else {
+				return Object.keys(list).length
+			}
 		},
 
 		first: function(array, n) {
@@ -218,7 +234,7 @@ fi = function(){
 
 			} else {
 
-				return array[-1]
+				return array[array.length-1]
 			}
 		},
 
@@ -250,10 +266,8 @@ fi = function(){
 
 				for (let i = 0; i < array.length; i++) {
 
-					if (finalResult[-1] !== array[i]) {
-
+					if (finalResult[finalResult.length-1] !== array[i]) {
 						finalResult.push(array[i])
-
 					}
 				}
 
@@ -275,12 +289,20 @@ fi = function(){
 
 		},
 
-		// bind: function(func, object) {
+		bind: function(func, object, n) {
+			 var finalMethod = null
 
-		// object.func = func
-		// return object.func
+			object.func = func
 
-		// },
+			if (n){
+				finalMethod = () => object.func(n);
+			} else {
+				finalMethod = val => object.func(val);
+			}
+
+			return finalMethod
+
+		},
 
 		keys: function(object) {
 
