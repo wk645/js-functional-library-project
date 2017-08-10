@@ -254,9 +254,47 @@ fi = function(){
 			return finalArray
 		},
 
-		// flatten: function(array, shallow) {
+		flatten: function(array, shallow) {
+			let firstHalf = null
+			let lastHalf = null
+			let final = []
+			let flattened = null
+			let index = null
 
-		// },
+			if (shallow) {
+				final = array
+
+				foundArrays = final.filter((element) => Array.isArray(element))
+
+				foundArrays.forEach( (element) => {
+					index = final.findIndex( (e) => e === element)
+					if ((index+1) === final.length) {
+						final = final.slice(0, final.length-1).concat(final[index])
+					} else {
+						firstHalf = final.slice(0, index)
+						lastHalf = final.slice(index+1)
+						final = firstHalf.concat(final[index]).concat(lastHalf)
+					}
+				})
+
+				return final
+			} else {
+				index = array.findIndex( (element) => Array.isArray(element))
+				if (index >= 0){
+					if ((index+1) === array.length) {
+						final = array.slice(0, array.length-1).concat(array[index])
+					} else {
+						firstHalf = array.slice(0, index)
+						lastHalf = array.slice(index+1)
+						final = firstHalf.concat(array[index]).concat(lastHalf)
+					}
+
+					return this.flatten(final)
+				} else {
+					return array
+				}
+			}
+		},
 
 		uniq: function(array, isSorted, iteratee) {
 
